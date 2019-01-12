@@ -1,9 +1,9 @@
 import json
-import udp_channels as udp
+from frc1076lib.udp_channel import UDPChannel as udp
 from Line import get_line
 
 LOCALIP = "10.10.76.2"
-LOCALPORT = 8877
+LOCALPORT = 8677
 REMOTEPORT = 8877
 REMOTEIP = "10.10.76.7"
 
@@ -31,8 +31,7 @@ class JoyLights:
         # initialize a counter to 0
         self.counter = 0
 
-        self.sender = udp.UDPChannel()
-        self.receiver = udp.UDPChannel(
+        self.sender = udp(
             local_ip=LOCALIP,
             local_port=LOCALPORT,
             remote_port=REMOTEPORT,
@@ -43,28 +42,29 @@ class JoyLights:
         # read joystick values
         # build json packet
         # send json packet to arduino.
-	x,y = position
+        x,y = position
+        print("HELLO THERE!")
+        print(self.counter)
+        # if (self.counter == 10):
+        self.counter = 0
 
-        if (self.counter == 10):
-            self.counter = 0
+        l = get_line(
+            start=(8, 8), end=(round((x + 1) * 8), round((y + 1) * 8)))
+        print(l)
+        w = []
+        for a in l:
+            w.append(cart_to_neo(location=a))
+        data = {
+            'sender': 'joystick',
+            'message': 'raw_display',
+            'num_pixels': len(w),
+            'pixel_values': w,
+            'clear': 1
+        }
 
-            l = get_line(
-                start=(8, 8), end=(round((x + 1) * 8), round((y + 1) * 8)))
-            print(l)
-            w = []
-            for a in l:
-                w.append(cart_to_neo(location=a))
-            data = {
-                'sender': 'joystick',
-                'message': 'raw_display',
-                'num_pixels': len(w),
-                'pixel_values': w,
-                'clear': 1
-            }
+        message = json.dumps(data)
 
-            message = json.dumps(data)
-
-            print(message)  #for debuging
-            self.sender.send_to(message)
-        else:
-            self.counter += 1
+        print(message)  #for debuging
+        self.sender.send_to(message)
+        # else:
+        #     self.counter += 1
