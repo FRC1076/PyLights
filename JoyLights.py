@@ -1,11 +1,14 @@
 import json
-import udp_channels as udp
+try:
+    from frc1076lib.udp_channel import UDPChannel as udp
+except:
+    from lib1076.udp_channel import UDPChannel as udp
 from Line import get_line
 
-LOCALIP = "10.10.76.2"
+LOCALIP = "localhost"
 LOCALPORT = 8877
-REMOTEPORT = 8877
-REMOTEIP = "10.10.76.7"
+REMOTEPORT = 8876
+REMOTEIP = "localhost"
 
 
 def cart_to_neo(location):
@@ -31,8 +34,7 @@ class JoyLights:
         # initialize a counter to 0
         self.counter = 0
 
-        self.sender = udp.UDPChannel()
-        self.receiver = udp.UDPChannel(
+        self.sender = udp(
             local_ip=LOCALIP,
             local_port=LOCALPORT,
             remote_port=REMOTEPORT,
@@ -43,7 +45,7 @@ class JoyLights:
         # read joystick values
         # build json packet
         # send json packet to arduino.
-	x,y = position
+        x, y = position
 
         if (self.counter == 10):
             self.counter = 0
@@ -65,6 +67,6 @@ class JoyLights:
             message = json.dumps(data)
 
             print(message)  #for debuging
-            self.sender.send_to(message)
+            self.sender.reply_to(message, REMOTEIP, REMOTEPORT)
         else:
             self.counter += 1
