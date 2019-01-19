@@ -1,5 +1,5 @@
 from JoyLights import JoyLights
-import random
+import random, time
 
 RIGHT = 0
 LEFT = 1
@@ -25,5 +25,9 @@ class joystick():
 js = joystick()
 jl = JoyLights('localhost', js)
 
-for i in range(100):
-    jl.update_lights([js.getX(1), js.getY(1)])
+
+movements = [(1,1), (.1,.1), (.5,1,), (.3,-.4), (-1,.5), (-.5,.6), (0,-.7), (-.9,.9), (.4,.9), (-.7,-.3), (.6,-.6)]
+for m in movements:
+    jl.update_lights((m[0], m[1]))
+    time.sleep(1)
+
